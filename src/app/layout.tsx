@@ -9,8 +9,10 @@ const lato = Lato({
   fallback: ["sans-serif", "arial"],
   variable: "--font-lato",
 });
+
 const nunito = Nunito({
   subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
   display: "swap",
   fallback: ["sans-serif", "arial"],
   variable: "--font-nunito",

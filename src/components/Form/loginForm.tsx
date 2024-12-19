@@ -26,22 +26,27 @@ import { Button } from "../ui/button";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { FirebaseError } from "firebase/app";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
 
+// Define the form schema using Zod for validation
 const formSchema = z.object({
   Email: z.string().email(),
   Password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
+// Initialize the form with schema validation and default values
 type FormValues = z.infer<typeof formSchema>;
 
 export default function LoginForm() {
   // State to manage loading state
   const [Loading, setLoading] = useState<boolean>(false);
+
+  // State to manage password visibility
+  const [PasswordVisibility, setPasswordVisibility] = useState<boolean>(false);
 
   // Initialize the form with schema validation and default values
   const form = useForm<FormValues>({
@@ -75,6 +80,10 @@ export default function LoginForm() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function togglePasswordVisibility() {
+    setPasswordVisibility((prev) => !prev);
   }
 
   return (
@@ -112,13 +121,30 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter your password"
-                  type="password"
-                  autoComplete="off"
-                  disabled={Loading}
-                  {...field}
-                />
+                <span className="relative flex items-center">
+                  <Input
+                    placeholder="Enter your password"
+                    type={PasswordVisibility ? "text" : "password"}
+                    autoComplete="off"
+                    disabled={Loading}
+                    {...field}
+                  />
+
+                  <button
+                    type="button"
+                    className="absolute right-2"
+                    onClick={togglePasswordVisibility}
+                    aria-label={
+                      PasswordVisibility ? "Hide password" : "Show password"
+                    }
+                  >
+                    {PasswordVisibility ? (
+                      <Eye className="size-5" />
+                    ) : (
+                      <EyeOff className="size-5" />
+                    )}
+                  </button>
+                </span>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,17 +154,7 @@ export default function LoginForm() {
         <p className="text-sm text-muted-foreground">
           Forgot your password?{" "}
           <Link href="/reset-password" className="underline hover:text-primary">
-            Reset it
-          </Link>
-        </p>
-
-        <p className="text-sm text-muted-foreground">
-          Doesn&apos;t have an account?{" "}
-          <Link
-            className="underline underline-offset-4 hover:text-primary"
-            href={"/signup"}
-          >
-            Create now
+            Click here
           </Link>
         </p>
 
@@ -148,9 +164,27 @@ export default function LoginForm() {
 
         <Separator className="h-px w-full rounded-full bg-zinc-300" />
 
-        <Button variant={"secondary"}>
-          Login with Google <SiGoogle />
+        <Button
+          type="button"
+          variant="outline"
+          disabled={Loading}
+          onClick={() => {
+            // Handle Google sign-in
+          }}
+        >
+          <SiGoogle className="mr-2" />
+          Sign in with Google
         </Button>
+
+        <p className="mt-4 text-center">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="underline underline-offset-4 hover:text-primary"
+          >
+            Sign Up
+          </Link>
+        </p>
       </form>
     </Form>
   );

@@ -1,5 +1,10 @@
 "use client";
+
+// Import necessary libraries and components
 import React, { useState } from "react";
+import Link from "next/link";
+
+// Import UI components
 import {
   Form,
   FormControl,
@@ -8,19 +13,24 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
-import Link from "next/link";
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
-import { z } from "zod";
+
+// Import form handling and validation libraries
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+// Import Firebase utilities
 import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
+// Define the form schema using Zod for validation
 const formSchema = z
   .object({
     firstName: z.string().nonempty("First name is required").trim(),
@@ -40,10 +50,21 @@ const formSchema = z
     message: "Passwords do not match",
   });
 
+// Define the form values type based on the schema
 type FormValues = z.infer<typeof formSchema>;
 
 export default function SignupForm() {
+  // State to manage loading state
   const [Loading, setLoading] = useState<boolean>(false);
+
+  // State to manage password visibility
+  const [PasswordVisibility, setPasswordVisibility] = useState<boolean>(false);
+
+  // State to manage confirm password visibility
+  const [ConfirmPasswordVisibility, setConfirmPasswordVisibility] =
+    useState<boolean>(false);
+
+  // Initialize the form with default values and validation schema
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,6 +77,7 @@ export default function SignupForm() {
     },
   });
 
+  // Function to handle form submission
   async function submitHandler(data: FormValues) {
     setLoading(true);
     try {
@@ -74,6 +96,14 @@ export default function SignupForm() {
     }
   }
 
+  function togglePasswordVisibility() {
+    setPasswordVisibility((prev) => !prev);
+  }
+
+  function toggleConfirmPasswordVisibility() {
+    setConfirmPasswordVisibility((prev) => !prev);
+  }
+
   return (
     <Form {...form}>
       <form
@@ -88,7 +118,6 @@ export default function SignupForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
-
               <FormControl>
                 <Input
                   placeholder="Enter your first name"
@@ -96,21 +125,21 @@ export default function SignupForm() {
                   autoComplete="off"
                   autoCapitalize="words"
                   disabled={Loading}
+                  aria-label="First Name"
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           name="lastName"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
-
               <FormControl>
                 <Input
                   placeholder="Enter your last name"
@@ -118,77 +147,114 @@ export default function SignupForm() {
                   autoComplete="off"
                   autoCapitalize="words"
                   disabled={Loading}
+                  aria-label="Last Name"
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
-
               <FormControl>
                 <Input
                   placeholder="Enter your email"
                   type="email"
                   autoComplete="off"
                   disabled={Loading}
+                  aria-label="Email"
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           name="password"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
-
               <FormControl>
-                <Input
-                  placeholder="Enter your password"
-                  type="password"
-                  autoComplete="off"
-                  disabled={Loading}
-                  {...field}
-                />
-              </FormControl>
+                <span className="relative flex items-center justify-center">
+                  <Input
+                    placeholder="Enter your password"
+                    type={PasswordVisibility ? "text" : "password"}
+                    autoComplete="off"
+                    disabled={Loading}
+                    aria-label="Password"
+                    {...field}
+                  />
 
+                  <button
+                    className="absolute right-2"
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    aria-label={
+                      PasswordVisibility ? "Hide password" : "Show password"
+                    }
+                  >
+                    {PasswordVisibility ? (
+                      <Eye className="size-5" />
+                    ) : (
+                      <EyeOff className="size-5" />
+                    )}
+                  </button>
+                </span>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           name="confirmPassword"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
-
               <FormControl>
-                <Input
-                  placeholder="Confirm password"
-                  type="password"
-                  autoComplete="off"
-                  disabled={Loading}
-                  {...field}
-                />
-              </FormControl>
+                <span className="relative flex items-center justify-center">
+                  <Input
+                    placeholder="Confirm password"
+                    type={ConfirmPasswordVisibility ? "text" : "password"}
+                    autoComplete="off"
+                    disabled={Loading}
+                    aria-label="Confirm Password"
+                    {...field}
+                  />
 
+                  <button
+                    className="absolute right-2"
+                    type="button"
+                    aria-label={
+                      ConfirmPasswordVisibility
+                        ? "Hide confirm password"
+                        : "Show confirm password"
+                    }
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    {ConfirmPasswordVisibility ? (
+                      <Eye className="size-5" />
+                    ) : (
+                      <EyeOff className="size-5" />
+                    )}
+                  </button>
+                </span>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           name="acceptTerms"
           control={form.control}
@@ -199,9 +265,9 @@ export default function SignupForm() {
                   onCheckedChange={field.onChange}
                   checked={field.value}
                   disabled={Loading}
+                  aria-label="Accept Terms and Conditions"
                 />
               </FormControl>
-
               <FormLabel>
                 I agree and accept{" "}
                 <Link
@@ -215,25 +281,33 @@ export default function SignupForm() {
           )}
         />
 
-        <p className="mt-4 text-sm text-muted-foreground">
+        <Button className="mt-4" type="submit" disabled={Loading}>
+          {Loading ? <Loader2 className="animate-spin" /> : "Sign Up"}
+        </Button>
+
+        <Separator className="my-4" />
+
+        <Button
+          type="button"
+          variant="outline"
+          disabled={Loading}
+          onClick={() => {
+            // Handle Google sign-in
+          }}
+        >
+          <SiGoogle className="mr-2" />
+          Sign Up with Google
+        </Button>
+
+        <p className="mt-4 text-center">
           Already have an account?{" "}
           <Link
+            href="/login"
             className="underline underline-offset-4 hover:text-primary"
-            href={"/login"}
           >
-            Login
+            Log In
           </Link>
         </p>
-
-        <Button className="mt-2" type="submit" disabled={Loading}>
-          Create account
-        </Button>
-
-        <Separator className="h-px w-full" />
-
-        <Button type="button" variant="secondary" disabled={Loading}>
-          Continue with Google <SiGoogle />
-        </Button>
       </form>
     </Form>
   );

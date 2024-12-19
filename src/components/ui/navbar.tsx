@@ -1,6 +1,7 @@
 import React from "react";
 import Logo from "./logo";
 import { Button } from "./button";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -16,8 +17,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex flex-row gap-2">
-          <Button variant={"secondary"}>Signup </Button>
-          <Button>Login</Button>
+          <Button variant={"secondary"}>
+            <Link href={"/signup"}>Sign up</Link>
+          </Button>
+          <Button>
+            <Link href={"/login"}>Login</Link>
+          </Button>
         </div>
       </nav>
     </header>

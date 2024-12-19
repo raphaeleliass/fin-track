@@ -30,6 +30,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
+import { SiGoogle } from "@icons-pack/react-simple-icons";
 
 const formSchema = z.object({
   Email: z.string().email(),
@@ -82,6 +83,8 @@ export default function LoginForm() {
         className="flex w-full max-w-xs flex-col gap-4"
         onSubmit={form.handleSubmit(handleLogin)}
       >
+        <p className="mx-auto font-lato text-2xl">Login</p>
+
         <FormField
           name="Email"
           control={form.control}
@@ -122,16 +125,32 @@ export default function LoginForm() {
           )}
         />
 
+        <p className="text-sm text-muted-foreground">
+          Forgot your password?{" "}
+          <Link href="/reset-password" className="underline hover:text-primary">
+            Reset it
+          </Link>
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          Doesn&apos;t have an account?{" "}
+          <Link
+            className="underline underline-offset-4 hover:text-primary"
+            href={"/signup"}
+          >
+            Create now
+          </Link>
+        </p>
+
         <Button className="w-full" type="submit" disabled={Loading}>
           {Loading ? <Loader2 className="animate-spin" /> : "Login"}
         </Button>
+
         <Separator className="h-px w-full rounded-full bg-zinc-300" />
-        <span className="flex flex-row gap-1">
-          <p className="text-sm text-muted-foreground">Forgot your password?</p>
-          <Link href="/reset-password" className="text-sm text-primary">
-            Reset it
-          </Link>
-        </span>
+
+        <Button variant={"secondary"}>
+          Login with Google <SiGoogle />
+        </Button>
       </form>
     </Form>
   );

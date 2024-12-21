@@ -26,9 +26,14 @@ import { z } from "zod";
 
 // Import Firebase utilities
 import { FirebaseError } from "firebase/app";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Define the form schema using Zod for validation
 const formSchema = z
@@ -64,6 +69,9 @@ export default function SignupForm() {
   const [ConfirmPasswordVisibility, setConfirmPasswordVisibility] =
     useState<boolean>(false);
 
+  // Initialize the router for navigation
+  const router = useRouter();
+
   // Initialize the form with default values and validation schema
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -93,6 +101,17 @@ export default function SignupForm() {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Function to handle Google login
+  async function loginWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push("/dashboard");
+    } catch (err) {
+      alert(err);
     }
   }
 
@@ -291,9 +310,7 @@ export default function SignupForm() {
           type="button"
           variant="outline"
           disabled={Loading}
-          onClick={() => {
-            // Handle Google sign-in
-          }}
+          onClick={loginWithGoogle}
         >
           <SiGoogle className="mr-2" />
           Sign Up with Google

@@ -23,7 +23,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 // Firebase authentication
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { FirebaseError } from "firebase/app";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -82,6 +86,18 @@ export default function LoginForm() {
     }
   }
 
+  // Function to handle Google login
+  async function loginWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push("/dashboard");
+    } catch (err) {
+      alert(err);
+    }
+  }
+
+  // toggle password visibility
   function togglePasswordVisibility() {
     setPasswordVisibility((prev) => !prev);
   }
@@ -168,9 +184,7 @@ export default function LoginForm() {
           type="button"
           variant="outline"
           disabled={Loading}
-          onClick={() => {
-            // Handle Google sign-in
-          }}
+          onClick={loginWithGoogle}
         >
           <SiGoogle className="mr-2" />
           Sign in with Google
